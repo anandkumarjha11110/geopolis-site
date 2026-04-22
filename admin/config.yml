@@ -1,5 +1,6 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: anandkumarjha11110/geoplois-site
   branch: main
 
 media_folder: "images/uploads"
