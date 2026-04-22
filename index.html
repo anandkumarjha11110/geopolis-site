@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEOPOLIS Society</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin:0;
+  font-family: 'Poppins', sans-serif;
+  background:#0a1f44;
+  color:white;
+}
+
+.navbar {
+  display:flex;
+  justify-content:space-between;
+  padding:15px 40px;
+  background:#081a36;
+}
+.navbar a {
+  color:white;
+  text-decoration:none;
+  margin-left:20px;
+}
+.navbar a:hover { color:gold; }
+
+.hero {
+  height: 90vh;
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)),
+              url('https://images.unsplash.com/photo-1467269204594-9661b134dd2b') no-repeat center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 3.2rem;
+  font-family: 'Playfair Display';
+  color: #ffffff;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  color: #e0e0e0;
+}
+
+.section {
+  padding:60px 40px;
+  text-align:center;
+}
+
+.cards {
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.card {
+  background:#102a5e;
+  padding:20px;
+  width:250px;
+  border-radius:10px;
+  transition:0.3s;
+}
+.card:hover {
+  transform:translateY(-10px);
+  background:#143c85;
+}
+
+.btn {
+  background:gold;
+  color:black;
+  padding:10px 20px;
+  text-decoration:none;
+  border-radius:5px;
+  display:inline-block;
+  margin-top:15px;
+}
+
+footer {
+  background:#081a36;
+  text-align:center;
+  padding:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <h2>GEOPOLIS</h2>
+  <div>
+    <a href="about.html">About</a>
+    <a href="journal.html">Journal</a>
+    <a href="events.html">Events</a>
+    <a href="team.html">Team</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <h1>GEOPOLIS Society</h1>
+    <p>Geopolitics & Public Policy Forum</p>
+<p>Politics • Diplomacy • Strategy</p>
+    <a href="journal.html" class="btn">Explore Research</a>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="section">
+  <h2>About Us</h2>
+  <p>A student-led academic society at Pondicherry University focused on geopolitics, governance, and policy research.</p>
+</div>
+
+<!-- FEATURES -->
+<div class="section">
+  <h2>What We Do</h2>
+  <div class="cards">
+
+    <div class="card">
+      <h3>Research</h3>
+      <p>Publish articles on geopolitics & policy.</p>
+    </div>
+
+    <div class="card">
+      <h3>Events</h3>
+      <p>Debates, discussions, lectures.</p>
+    </div>
+
+    <div class="card">
+      <h3>Policy</h3>
+      <p>Real-world governance analysis.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="section">
+  <h2>Join GEOPOLIS</h2>
+  <p>Be part of a serious academic and UPSC-oriented research ecosystem.</p>
+  <a href="contact.html" class="btn">Join Now</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 GEOPOLIS Society | Pondicherry University</p>
+</footer>
+
+</body>
+</html>
