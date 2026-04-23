@@ -3,6 +3,7 @@ backend:
   repo: Anandkumarjha11110/geopolis-site
   branch: main
   base_url: https://geopolis-oauth.anandkumarjha11110.workers.dev
+  site_domain: geopolis-site.anandkumarjha11110.workers.dev
 
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
