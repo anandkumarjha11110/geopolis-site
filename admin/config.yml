@@ -4,8 +4,6 @@ backend:
   branch: main
   base_url: https://geopolis-oauth.anandkumarjha11110.workers.dev
 
-publish_mode: editorial_workflow
-
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
 
