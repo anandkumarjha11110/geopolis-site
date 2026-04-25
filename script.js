@@ -42,15 +42,6 @@ async function fetchMarkdownByUrl(url) {
   return res.text();
 }
 
-function escapeHtml(text) {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 async function getArticleIndex() {
   const api = `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.contentDir}`;
   const response = await fetch(api, { headers: { Accept: 'application/vnd.github+json' } });
@@ -65,41 +56,43 @@ async function getArticleIndex() {
   }));
 }
 
-function renderMarkdown(md) {
-  const escaped = escapeHtml(md)
-    .replace(/^###\s+(.*)$/gm, '<h3>$1</h3>')
-    .replace(/^##\s+(.*)$/gm, '<h2>$1</h2>')
-    .replace(/^#\s+(.*)$/gm, '<h1>$1</h1>')
-    .replace(/^>\s+(.*)$/gm, '<blockquote>$1</blockquote>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+function initMarkdownRenderer() {
+  if (typeof marked === 'undefined') {
+    return null;
+  }
 
-  const lines = escaped.split('\n');
-  let inList = false;
+  const renderer = new marked.Renderer();
+  renderer.image = ({ href, title, text }) => {
+    const safeCaption = text || title || '';
+    const captionHtml = safeCaption ? `<figcaption>${safeCaption}</figcaption>` : '';
+    return `<figure><img src="${href}" alt="${safeCaption}" loading="lazy">${captionHtml}</figure>`;
+  };
 
-  const html = lines.map((line) => {
-    if (/^\s*[-*]\s+/.test(line)) {
-      const item = line.replace(/^\s*[-*]\s+/, '');
-      if (!inList) {
-        inList = true;
-        return `<ul><li>${item}</li>`;
-      }
-      return `<li>${item}</li>`;
+  marked.setOptions({
+    gfm: true,
+    breaks: false,
+    renderer
+  });
+
+  return marked;
+}
+
+function enhanceArticleBody(articleBody) {
+  articleBody.querySelectorAll('a').forEach((link) => {
+    const href = link.getAttribute('href') || '';
+    if (href.startsWith('http')) {
+      link.setAttribute('target', '_blank');
+      link.setAttribute('rel', 'noopener noreferrer');
     }
+  });
 
-    if (inList) {
-      inList = false;
-      if (!line.trim()) return '</ul>';
-      return `</ul>${line.trim() ? `<p>${line}</p>` : ''}`;
-    }
-
-    if (!line.trim()) return '';
-    if (/^<h\d|^<blockquote/.test(line)) return line;
-    return `<p>${line}</p>`;
-  }).join('');
-
-  return inList ? `${html}</ul>` : html;
+  articleBody.querySelectorAll('table').forEach((table) => {
+    if (table.parentElement?.classList.contains('table-scroll')) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'table-scroll';
+    table.parentNode.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  });
 }
 
 function syncFormLinks() {
@@ -178,15 +171,35 @@ async function loadArticlePage() {
 
     const raw = await fetchMarkdownByUrl(target.url);
     const { data, body } = parseFrontmatter(raw);
+    const markdownEngine = initMarkdownRenderer();
+    const parsedMarkdown = markdownEngine
+      ? markdownEngine.parse(body)
+      : `<p>${body}</p>`;
+    const shareUrl = window.location.href;
+    const shareText = encodeURIComponent(data.title || slug);
 
     articleHost.innerHTML = `
       <header class="article-header">
-        <p class="kicker">${data.category || 'Journal Article'}</p>
+        <a class="btn btn--outline btn--back" href="journal.html">← Back to Journal</a>
+        <p class="kicker"><span class="article-tag">${data.category || 'Journal Article'}</span></p>
         <h1>${data.title || slug}</h1>
-        <p class="meta">By ${data.author || 'GEOPOLIS Editorial Board'} · ${formatDate(data.date)}</p>
+        <p class="meta"><span>By ${data.author || 'GEOPOLIS Editorial Board'}</span><span>·</span><time datetime="${data.date || ''}">${formatDate(data.date)}</time></p>
+        <div class="share-row">
+          <a class="btn btn--outline" href="https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${shareText}" target="_blank" rel="noopener noreferrer">Share on X</a>
+          <a class="btn btn--outline" href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener noreferrer">Share on LinkedIn</a>
+        </div>
       </header>
-      <article class="article-body">${renderMarkdown(body)}</article>
+      <article class="article-body">${parsedMarkdown}</article>
     `;
+
+    const articleBody = articleHost.querySelector('.article-body');
+    if (articleBody) {
+      enhanceArticleBody(articleBody);
+    }
+
+    if (typeof hljs !== 'undefined') {
+      hljs.highlightAll();
+    }
   } catch (error) {
     articleHost.innerHTML = `<div class="empty-state">${error.message}</div>`;
   }
