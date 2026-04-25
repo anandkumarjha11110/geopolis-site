@@ -1,15 +1,20 @@
 backend:
-  name: test-repo
+  name: github
+  repo: anandkumarjha11110/geopolis-site
+  branch: main
+  auth_endpoint: https://YOUR_OAUTH_SERVER_DOMAIN/auth
 
-media_folder: "assets/uploads"
-public_folder: "/assets/uploads"
+media_folder: "public/images"
+public_folder: "/images"
+
+local_backend: true
 
 collections:
   - name: "articles"
     label: "Articles"
     folder: "content/articles"
     create: true
-    slug: "{{slug}}"
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Date", name: "date", widget: "datetime" }
