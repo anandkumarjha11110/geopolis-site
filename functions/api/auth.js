@@ -3,13 +3,11 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
 
-  // STEP 1: redirect to GitHub
   if (!code) {
-    const redirect = `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&scope=repo`;
+    const redirect = `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&redirect_uri=https://geopolis-site.pages.dev/admin/&scope=repo`;
     return Response.redirect(redirect, 302);
   }
 
-  // STEP 2: exchange code for token
   const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
     headers: {
