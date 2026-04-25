@@ -2,9 +2,10 @@ backend:
   name: github
   repo: anandkumarjha11110/geopolis-site
   branch: main
+  auth_endpoint: "/api/auth"
 
-media_folder: "assets/images"
-public_folder: "/assets/images"
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
 
 collections:
   - name: "articles"
@@ -14,7 +15,6 @@ collections:
     slug: "{{slug}}"
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "Author", name: "author", widget: "string" }
       - { label: "Date", name: "date", widget: "datetime" }
-      - { label: "Category", name: "category", widget: "string" }
+      - { label: "Author", name: "author", widget: "string" }
       - { label: "Body", name: "body", widget: "markdown" }
