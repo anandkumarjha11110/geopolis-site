@@ -293,19 +293,24 @@ async function loadTeamPage() {
   const host = document.getElementById('teamGrid');
   if (!host) return;
   const list = await getCollectionIndex(CONFIG.teamDir);
-  if (!list.length) return;
+  if (!list.length) {
+    host.innerHTML = '<div class="empty-state">No team members added yet.</div>';
+    return;
+  }
   const members = await Promise.all(list.map(async (item) => {
     const raw = await fetchMarkdownByUrl(item.url);
-    const { data } = parseFrontmatter(raw);
-    return data;
+    const { data, body } = parseFrontmatter(raw);
+    return { ...data, body };
   }));
+  members.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   host.innerHTML = members.map((m) => `
     <article class="card">
-      ${m.photo ? `<img loading="lazy" src="${m.photo}" alt="${m.name}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;">` : `<div style="width:72px;height:72px;border-radius:50%;background:#dce4f5;display:grid;place-items:center;font-weight:700;">${(m.name || 'G').slice(0,1)}</div>`}
+      ${(m.image || m.photo) ? `<img loading="lazy" src="${m.image || m.photo}" alt="${m.name}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;">` : `<div style="width:72px;height:72px;border-radius:50%;background:#dce4f5;display:grid;place-items:center;font-weight:700;">${(m.name || 'G').slice(0,1)}</div>`}
       <h3>${m.name}</h3>
       <p><strong>${m.role}</strong></p>
       <p>${m.course_year || ''}</p>
       <p>${m.research_interests || ''}</p>
+      <p>${m.bio || m.body || ''}</p>
     </article>
   `).join('');
 }

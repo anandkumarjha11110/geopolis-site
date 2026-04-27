@@ -33,5 +33,7 @@ collections:
     fields:
       - { label: "Name", name: "name", widget: "string" }
       - { label: "Role", name: "role", widget: "string" }
-      - { label: "Bio", name: "bio", widget: "text" }
-      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Course & Year", name: "course_year", widget: "string", required: false }
+      - { label: "Research Interests", name: "research_interests", widget: "string", required: false }
+      - { label: "Bio", name: "bio", widget: "text", required: false }
+      - { label: "Image", name: "image", widget: "image", required: false }
