@@ -2,11 +2,31 @@ backend:
   name: github
   repo: anandkumarjha11110/geopolis-site
   branch: main
+  site_domain: geopolis-site.pages.dev
+  base_url: https://geopolis-site.pages.dev/api
+  auth_endpoint: auth
 
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
 
 collections:
+  - name: "articles"
+    label: "Publications"
+    folder: "content/articles"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Author", name: "author", widget: "string", default: "GEOPOLIS Editorial Board" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Category", name: "category", widget: "select", options: ["Research Articles", "Geopolitics", "Policy", "General"], default: "Research Articles" }
+      - { label: "Abstract", name: "abstract", widget: "text", required: false }
+      - { label: "Keywords", name: "keywords", widget: "string", required: false, hint: "Comma-separated" }
+      - { label: "Tags", name: "tags", widget: "string", required: false, hint: "Comma-separated" }
+      - { label: "Status", name: "status", widget: "select", options: ["publish", "draft"], default: "publish" }
+      - { label: "PDF URL", name: "pdf", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }
+
   - name: "team"
     label: "Team Members"
     folder: "content/team"
