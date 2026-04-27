@@ -3,65 +3,17 @@ backend:
   repo: anandkumarjha11110/geopolis-site
   branch: main
 
-media_folder: "public/images"
-public_folder: "/images"
-local_backend: true
-publish_mode: editorial_workflow
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
 
 collections:
-  - name: "articles"
-    label: "Journal Articles"
-    folder: "content/articles"
-    create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Date", name: "date", widget: "datetime" }
-      - { label: "Author", name: "author", widget: "string" }
-      - { label: "Category", name: "category", widget: "select", options: ["Research Articles", "Policy Briefs", "Opinion", "Book Reviews"] }
-      - { label: "Abstract", name: "abstract", widget: "text" }
-      - { label: "Keywords", name: "keywords", widget: "string", required: false, hint: "Comma-separated" }
-      - { label: "Tags", name: "tags", widget: "string", required: false, hint: "Comma-separated e.g. Indo-Pacific, Climate Policy" }
-      - { label: "PDF URL", name: "pdf", widget: "string", required: false }
-      - { label: "Status", name: "status", widget: "select", options: ["draft", "review", "publish"], default: "draft" }
-      - { label: "Body", name: "body", widget: "markdown" }
-
-  - name: "dissertations"
-    label: "Dissertation Archive"
-    folder: "content/dissertations"
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - { label: "Student", name: "student", widget: "string" }
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Supervisor", name: "supervisor", widget: "string" }
-      - { label: "Batch", name: "batch", widget: "select", options: ["2023–25", "2024–26"] }
-      - { label: "Topic", name: "topic", widget: "string" }
-      - { label: "Abstract", name: "abstract", widget: "text" }
-      - { label: "PDF URL", name: "pdf", widget: "string", required: false }
-      - { label: "Body", name: "body", widget: "markdown", required: false }
-
   - name: "team"
     label: "Team Members"
     folder: "content/team"
     create: true
-    slug: "{{slug}}"
+    slug: "{{name}}"
     fields:
       - { label: "Name", name: "name", widget: "string" }
       - { label: "Role", name: "role", widget: "string" }
-      - { label: "Course + Year", name: "course_year", widget: "string", required: false }
-      - { label: "Research Interests", name: "research_interests", widget: "text", required: false }
-      - { label: "Photo", name: "photo", widget: "image", required: false }
-
-  - name: "events"
-    label: "Events"
-    folder: "content/events"
-    create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Date", name: "date", widget: "datetime" }
-      - { label: "Speaker", name: "speaker", widget: "string", required: false }
-      - { label: "Description", name: "description", widget: "text" }
-      - { label: "Poster", name: "poster", widget: "image", required: false }
-      - { label: "Body", name: "body", widget: "markdown", required: false }
+      - { label: "Bio", name: "bio", widget: "text" }
+      - { label: "Image", name: "image", widget: "image" }
