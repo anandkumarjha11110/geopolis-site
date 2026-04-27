@@ -2,7 +2,6 @@ backend:
   name: github
   repo: anandkumarjha11110/geopolis-site
   branch: main
-  site_domain: geopolis-site.pages.dev
   base_url: https://geopolis-site.pages.dev
   auth_endpoint: api/auth
 
@@ -19,11 +18,10 @@ collections:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Author", name: "author", widget: "string", default: "GEOPOLIS Editorial Board" }
       - { label: "Date", name: "date", widget: "datetime" }
-      - { label: "Category", name: "category", widget: "select", options: ["Research Articles", "Geopolitics", "Policy", "General"], default: "Research Articles" }
+      - { label: "Category", name: "category", widget: "select", options: ["Research Articles", "Geopolitics", "Policy", "General"] }
       - { label: "Abstract", name: "abstract", widget: "text", required: false }
-      - { label: "Keywords", name: "keywords", widget: "string", required: false, hint: "Comma-separated" }
-      - { label: "Tags", name: "tags", widget: "string", required: false, hint: "Comma-separated" }
-      - { label: "Status", name: "status", widget: "select", options: ["publish", "draft"], default: "publish" }
+      - { label: "Keywords", name: "keywords", widget: "string", required: false }
+      - { label: "Tags", name: "tags", widget: "string", required: false }
       - { label: "PDF URL", name: "pdf", widget: "string", required: false }
       - { label: "Body", name: "body", widget: "markdown" }
 
