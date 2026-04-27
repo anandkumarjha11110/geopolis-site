@@ -1,7 +1,7 @@
-function cookieSettings(requestUrl) {
+function buildCookieAttributes(requestUrl, maxAgeSeconds) {
   const url = new URL(requestUrl);
   const secure = url.protocol === 'https:' ? ' Secure;' : '';
-  return `HttpOnly; Path=/api; SameSite=Lax; Max-Age=600;${secure}`;
+  return `HttpOnly; Path=/api; SameSite=Lax; Max-Age=${maxAgeSeconds};${secure}`;
 }
 
 export async function onRequest(context) {
@@ -25,7 +25,7 @@ export async function onRequest(context) {
     status: 302,
     headers: {
       Location: github.toString(),
-      'Set-Cookie': `state=${state}; ${cookieSettings(context.request.url)}`
+      'Set-Cookie': `cms_oauth_state=${state}; ${buildCookieAttributes(context.request.url, 600)}`
     }
   });
 }
