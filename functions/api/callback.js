@@ -15,12 +15,58 @@ function buildCookieAttributes(requestUrl, maxAgeSeconds) {
   return `HttpOnly; Path=/api; SameSite=Lax; Max-Age=${maxAgeSeconds};${secure}`;
 }
 
-function htmlResponse(messageScript, status = 200) {
+function escapeForInlineScript(value) {
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
+}
+
+function buildCallbackResponse(status, payload, requestUrl, statusCode = 200) {
+  const serializedPayload = escapeForInlineScript(JSON.stringify(payload));
+
   return new Response(
-    `<!doctype html><html><body>${messageScript}</body></html>`,
+    `<!doctype html>
+<html>
+  <body>
+    <script>
+      (function () {
+        function sendResult() {
+          if (!window.opener) {
+            return;
+          }
+
+          window.opener.postMessage(
+            'authorization:github:${status}:${serializedPayload}',
+            '*'
+          );
+          window.close();
+        }
+
+        function receiveMessage() {
+          sendResult();
+          window.removeEventListener('message', receiveMessage, false);
+        }
+
+        window.addEventListener('message', receiveMessage, false);
+
+        if (window.opener) {
+          window.opener.postMessage('authorizing:github', '*');
+        } else {
+          sendResult();
+        }
+      })();
+    </script>
+    <p>Authorizing Decap CMS…</p>
+  </body>
+</html>`,
     {
-      status,
-      headers: { 'Content-Type': 'text/html; charset=utf-8' }
+      status: statusCode,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Set-Cookie': `cms_oauth_state=; ${buildCookieAttributes(requestUrl, 0)}`
+      }
     }
   );
 }
@@ -30,34 +76,41 @@ export async function onRequest(context) {
   const clientSecret = context.env.GITHUB_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    return htmlResponse('<p>Missing GitHub OAuth environment variables.</p>', 500);
+    return new Response('Missing GitHub OAuth environment variables.', { status: 500 });
   }
 
   const url = new URL(context.request.url);
+  const provider = url.searchParams.get('provider');
+
+  if (provider && provider !== 'github') {
+    return new Response('Invalid provider', { status: 400 });
+  }
+
   const code = url.searchParams.get('code');
   const state = url.searchParams.get('state');
   const oauthError = url.searchParams.get('error');
   const oauthErrorDescription = url.searchParams.get('error_description');
 
   if (oauthError) {
-    return htmlResponse(
-      `<script>window.opener && window.opener.postMessage('authorization:github:error:${oauthErrorDescription || oauthError}','*');window.close();</script>`,
+    return buildCallbackResponse(
+      'error',
+      oauthErrorDescription || oauthError,
+      context.request.url,
       400
     );
   }
 
   if (!code || !state) {
-    return htmlResponse('<p>Missing OAuth code or state.</p>', 400);
+    return new Response('Missing OAuth code or state.', { status: 400 });
   }
 
   const cookies = parseCookies(context.request.headers.get('cookie'));
   const stateCookie = cookies.cms_oauth_state;
 
   if (!stateCookie || stateCookie !== state) {
-    return new Response('<p>Invalid OAuth state. Please retry login.</p>', {
+    return new Response('Invalid OAuth state. Please retry login.', {
       status: 400,
       headers: {
-        'Content-Type': 'text/html; charset=utf-8',
         'Set-Cookie': `cms_oauth_state=; ${buildCookieAttributes(context.request.url, 0)}`
       }
     });
@@ -74,7 +127,7 @@ export async function onRequest(context) {
       client_secret: clientSecret,
       code,
       state,
-      redirect_uri: `${url.origin}/api/callback`
+      redirect_uri: `${url.origin}/api/callback?provider=github`
     }).toString()
   });
 
@@ -82,25 +135,12 @@ export async function onRequest(context) {
 
   if (!tokenResponse.ok || !tokenData.access_token) {
     const errorMessage = tokenData.error_description || tokenData.error || 'Token exchange failed';
-    return new Response(
-      `<!doctype html><html><body><script>window.opener && window.opener.postMessage('authorization:github:error:${errorMessage}','*');window.close();</script><p>${errorMessage}</p></body></html>`,
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'text/html; charset=utf-8',
-          'Set-Cookie': `cms_oauth_state=; ${buildCookieAttributes(context.request.url, 0)}`
-        }
-      }
-    );
+    return buildCallbackResponse('error', errorMessage, context.request.url, 500);
   }
 
-  return new Response(
-    `<!doctype html><html><body><script>window.opener && window.opener.postMessage('authorization:github:success:${tokenData.access_token}','*');window.close();</script></body></html>`,
-    {
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Set-Cookie': `cms_oauth_state=; ${buildCookieAttributes(context.request.url, 0)}`
-      }
-    }
+  return buildCallbackResponse(
+    'success',
+    { token: tokenData.access_token },
+    context.request.url
   );
 }

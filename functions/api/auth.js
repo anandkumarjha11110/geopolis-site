@@ -12,13 +12,19 @@ export async function onRequest(context) {
   }
 
   const url = new URL(context.request.url);
-  const redirectUri = `${url.origin}/api/callback`;
+  const provider = url.searchParams.get('provider');
+
+  if (provider && provider !== 'github') {
+    return new Response('Invalid provider', { status: 400 });
+  }
+
+  const redirectUri = `${url.origin}/api/callback?provider=github`;
   const state = crypto.randomUUID();
 
   const github = new URL('https://github.com/login/oauth/authorize');
   github.searchParams.set('client_id', clientId);
   github.searchParams.set('redirect_uri', redirectUri);
-  github.searchParams.set('scope', 'repo');
+  github.searchParams.set('scope', 'repo,user');
   github.searchParams.set('state', state);
 
   return new Response(null, {
