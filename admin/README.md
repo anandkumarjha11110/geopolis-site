@@ -16,7 +16,16 @@ Set these in your Cloudflare Pages project settings:
 
 In GitHub (Settings → Developer settings → OAuth Apps), create/update your OAuth app:
 
-- **Homepage URL:** `https://geopolis-site.pages.dev/admin/`
+- **Application name:** `Geopolis CMS`
+- **Homepage URL:** `https://geopolis-site.pages.dev`
 - **Authorization callback URL:** `https://geopolis-site.pages.dev/api/callback`
 
-After these values are set, the **Login with GitHub** button in `/admin/` authenticates against GitHub (not Netlify) and CMS publishes directly to `main` in `anandkumarjha11110/geopolis-site`.
+## What was fixed
+
+- Added OAuth `state` verification between `/api/auth` and `/api/callback`.
+- Switched the token exchange to `application/x-www-form-urlencoded` (GitHub OAuth expected format).
+- Added explicit OAuth error handling that returns messages Decap CMS can consume.
+- Cleared state cookies after callback handling.
+- Set CMS `auth_endpoint` to `/api/auth`.
+
+After these values are set, the **Login with GitHub** button in `/admin/` authenticates against GitHub and Decap CMS can commit changes directly to `main` in `anandkumarjha11110/geopolis-site`.

@@ -1,3 +1,9 @@
+function cookieSettings(requestUrl) {
+  const url = new URL(requestUrl);
+  const secure = url.protocol === 'https:' ? ' Secure;' : '';
+  return `HttpOnly; Path=/api; SameSite=Lax; Max-Age=600;${secure}`;
+}
+
 export async function onRequest(context) {
   const clientId = context.env.GITHUB_CLIENT_ID;
 
@@ -19,7 +25,7 @@ export async function onRequest(context) {
     status: 302,
     headers: {
       Location: github.toString(),
-      'Set-Cookie': `state=${state}; HttpOnly; Secure; Path=/api; Max-Age=600`
+      'Set-Cookie': `state=${state}; ${cookieSettings(context.request.url)}`
     }
   });
 }
